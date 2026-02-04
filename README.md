@@ -478,11 +478,89 @@ end)
 
 -- ==================== MAIN FEATURES ====================
 
+local coordGui, updateConnection
+local enabled = false
 
+local function createCoordGui()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local hrp = character:WaitForChild("HumanoidRootPart")
 
--- ==================== PLAYER ====================
+    coordGui = Instance.new("ScreenGui", player.PlayerGui)
+    coordGui.Name = "PositionDisplay"
 
+    local frame = Instance.new("Frame", coordGui)
+    frame.Size = UDim2.new(0, 250, 0, 120)
+    frame.Position = UDim2.new(1, -260, 0, 10)
+    frame.BackgroundColor3 = Color3.fromRGB(35,35,35)
+    frame.BorderSizePixel = 0
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0,8)
 
+    local title = Instance.new("TextLabel", frame)
+    title.Size = UDim2.new(1,0,0,30)
+    title.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    title.Text = "Localização"
+    title.TextColor3 = Color3.new(1,1,1)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 16
+    Instance.new("UICorner", title).CornerRadius = UDim.new(0,8)
+
+    local function makeLabel(y, color)
+        local lbl = Instance.new("TextLabel", frame)
+        lbl.Position = UDim2.new(0,10,0,y)
+        lbl.Size = UDim2.new(1,-20,0,25)
+        lbl.BackgroundTransparency = 1
+        lbl.TextColor3 = color
+        lbl.Font = Enum.Font.GothamMedium
+        lbl.TextSize = 14
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        return lbl
+    end
+
+    local xLabel = makeLabel(35, Color3.fromRGB(255,100,100))
+    local yLabel = makeLabel(60, Color3.fromRGB(100,255,100))
+    local zLabel = makeLabel(85, Color3.fromRGB(100,100,255))
+
+    updateConnection = RunService.RenderStepped:Connect(function()
+        if hrp then
+            local p = hrp.Position
+            xLabel.Text = "X: " .. math.floor(p.X10)/10
+            yLabel.Text = "Y: " .. math.floor(p.Y10)/10
+            zLabel.Text = "Z: " .. math.floor(p.Z*10)/10
+        end
+    end)
+end
+
+local function toggleCoords()
+    enabled = not enabled
+
+    if enabled then
+        coordButton.Text = "Cordenadas: ON"
+        coordButton.BackgroundColor3 = Color3.fromRGB(50,150,50)
+        createCoordGui()
+    else
+        coordButton.Text = "Cordenadas: OFF"
+        coordButton.BackgroundColor3 = Color3.fromRGB(150,50,50)
+
+        if updateConnection then
+            updateConnection:Disconnect()
+            updateConnection = nil
+        end
+
+        if coordGui then
+            coordGui:Destroy()
+            coordGui = nil
+        end
+    end
+end
+
+coordButton.MouseButton1Click:Connect(toggleCoords)
+
+-- ===== INFINITE YIELD =====
+iyButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet(
+        "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"
+    ))()
+end)
 
 -- ==================== CONFIG ====================
 
