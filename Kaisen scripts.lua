@@ -35,7 +35,7 @@ if player.PlayerGui:FindFirstChild("KaisenScripts") then
     player.PlayerGui:FindFirstChild("KaisenScripts"):Destroy()
 end
 
--- Notificação
+-- Notificacao
 game.StarterGui:SetCore("SendNotification", {
     Title = "Kaisen Scripts",
     Text = "Pressione '" .. Config.ToggleKey.Name .. "' para abrir/fechar",
@@ -501,7 +501,7 @@ local function toggleCoordinates(enabled)
         title.Size = UDim2.new(1, 0, 0, 30)
         title.Position = UDim2.new(0, 0, 0, 0)
         title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        title.Text = "Localização"
+        title.Text = "Localizacao"
         title.TextColor3 = Color3.fromRGB(255, 255, 255)
         title.Font = Enum.Font.GothamBold
         title.TextSize = 16
@@ -614,6 +614,150 @@ InfiniteYieldBtn.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
 end)
 
+-- Frame para Script Customizado
+local CustomScriptFrame = Instance.new("Frame")
+CustomScriptFrame.Size = UDim2.new(1, -10, 0, 120)
+CustomScriptFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+CustomScriptFrame.BorderSizePixel = 0
+CustomScriptFrame.Parent = MainSection
+
+Instance.new("UICorner", CustomScriptFrame).CornerRadius = UDim.new(0, 8)
+
+local CustomScriptTitle = Instance.new("TextLabel")
+CustomScriptTitle.Size = UDim2.new(1, -20, 0, 25)
+CustomScriptTitle.Position = UDim2.new(0, 10, 0, 8)
+CustomScriptTitle.BackgroundTransparency = 1
+CustomScriptTitle.Text = "📜 Script Customizado"
+CustomScriptTitle.Font = Enum.Font.GothamBold
+CustomScriptTitle.TextColor3 = Color3.fromRGB(200, 200, 210)
+CustomScriptTitle.TextSize = 13
+CustomScriptTitle.TextXAlignment = Enum.TextXAlignment.Left
+CustomScriptTitle.Parent = CustomScriptFrame
+
+local UrlInputFrame = Instance.new("Frame")
+UrlInputFrame.Size = UDim2.new(1, -20, 0, 35)
+UrlInputFrame.Position = UDim2.new(0, 10, 0, 38)
+UrlInputFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 42)
+UrlInputFrame.BorderSizePixel = 0
+UrlInputFrame.Parent = CustomScriptFrame
+
+Instance.new("UICorner", UrlInputFrame).CornerRadius = UDim.new(0, 6)
+
+local UrlInput = Instance.new("TextBox")
+UrlInput.Size = UDim2.new(1, -15, 1, 0)
+UrlInput.Position = UDim2.new(0, 8, 0, 0)
+UrlInput.BackgroundTransparency = 1
+UrlInput.Text = ""
+UrlInput.PlaceholderText = "Cole a URL do script aqui..."
+UrlInput.Font = Enum.Font.Gotham
+UrlInput.TextColor3 = Color3.fromRGB(200, 200, 210)
+UrlInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 130)
+UrlInput.TextSize = 12
+UrlInput.TextXAlignment = Enum.TextXAlignment.Left
+UrlInput.ClearTextOnFocus = false
+UrlInput.Parent = UrlInputFrame
+
+local ExecuteCustomBtn = Instance.new("TextButton")
+ExecuteCustomBtn.Size = UDim2.new(0.48, -5, 0, 30)
+ExecuteCustomBtn.Position = UDim2.new(0, 10, 1, -38)
+ExecuteCustomBtn.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
+ExecuteCustomBtn.BorderSizePixel = 0
+ExecuteCustomBtn.Text = "▶️ Executar"
+ExecuteCustomBtn.Font = Enum.Font.GothamBold
+ExecuteCustomBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ExecuteCustomBtn.TextSize = 12
+ExecuteCustomBtn.Parent = CustomScriptFrame
+
+Instance.new("UICorner", ExecuteCustomBtn).CornerRadius = UDim.new(0, 6)
+
+local CopyCodeBtn = Instance.new("TextButton")
+CopyCodeBtn.Size = UDim2.new(0.48, -5, 0, 30)
+CopyCodeBtn.Position = UDim2.new(0.52, 5, 1, -38)
+CopyCodeBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 100)
+CopyCodeBtn.BorderSizePixel = 0
+CopyCodeBtn.Text = "📋 Copiar Código"
+CopyCodeBtn.Font = Enum.Font.GothamBold
+CopyCodeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CopyCodeBtn.TextSize = 12
+CopyCodeBtn.Parent = CustomScriptFrame
+
+Instance.new("UICorner", CopyCodeBtn).CornerRadius = UDim.new(0, 6)
+
+ExecuteCustomBtn.MouseButton1Click:Connect(function()
+    local url = UrlInput.Text
+    
+    if url == "" then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Erro",
+            Text = "Por favor, insira uma URL!",
+            Duration = 3
+        })
+        return
+    end
+    
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Script Customizado",
+        Text = "Executando script...",
+        Duration = 3
+    })
+    
+    local success, err = pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+    
+    if not success then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Erro",
+            Text = "Falha ao executar: " .. tostring(err),
+            Duration = 5
+        })
+    else
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Sucesso",
+            Text = "Script executado com sucesso!",
+            Duration = 3
+        })
+    end
+end)
+
+CopyCodeBtn.MouseButton1Click:Connect(function()
+    local url = UrlInput.Text
+    
+    if url == "" then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Erro",
+            Text = "Por favor, insira uma URL!",
+            Duration = 3
+        })
+        return
+    end
+    
+    local code = "loadstring(game:HttpGet(\"" .. url .. "\"))()"
+    
+    -- Tenta usar setclipboard se disponível
+    local success = pcall(function()
+        setclipboard(code)
+    end)
+    
+    if success then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Copiado!",
+            Text = "Codigo copiado para a area de transferencia!",
+            Duration = 3
+        })
+    else
+        -- Se setclipboard não estiver disponível, mostra o código
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Codigo",
+            Text = "setclipboard nao disponivel",
+            Duration = 3
+        })
+        print("========== CODIGO GERADO ==========")
+        print(code)
+        print("===================================")
+    end
+end)
+
 -- ==================== CONFIG ====================
 
 createKeybind("Toggle UI Key", Config.ToggleKey, ConfigSection, function(newKey)
@@ -630,7 +774,7 @@ local SaveBtn = Instance.new("TextButton")
 SaveBtn.Size = UDim2.new(1, -10, 0, 45)
 SaveBtn.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
 SaveBtn.BorderSizePixel = 0
-SaveBtn.Text = "💾 Salvar Configuração"
+SaveBtn.Text = "💾 Salvar Configuracao"
 SaveBtn.Font = Enum.Font.GothamBold
 SaveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SaveBtn.TextSize = 14
@@ -642,8 +786,8 @@ SaveBtn.MouseButton1Click:Connect(function()
     writefile("KaisenScripts_Config.json", game:GetService("HttpService"):JSONEncode(Config))
     
     game.StarterGui:SetCore("SendNotification", {
-        Title = "Configuração Salva",
-        Text = "Suas configurações foram salvas!",
+        Title = "Configuracao Salva",
+        Text = "Suas configuracoes foram salvas!",
         Duration = 3
     })
 end)
@@ -652,7 +796,7 @@ local LoadBtn = Instance.new("TextButton")
 LoadBtn.Size = UDim2.new(1, -10, 0, 45)
 LoadBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 100)
 LoadBtn.BorderSizePixel = 0
-LoadBtn.Text = "📂 Carregar Configuração"
+LoadBtn.Text = "📂 Carregar Configuracao"
 LoadBtn.Font = Enum.Font.GothamBold
 LoadBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 LoadBtn.TextSize = 14
@@ -668,14 +812,14 @@ LoadBtn.MouseButton1Click:Connect(function()
         end
         
         game.StarterGui:SetCore("SendNotification", {
-            Title = "Configuração Carregada",
-            Text = "Suas configurações foram carregadas!",
+            Title = "Configuracao Carregada",
+            Text = "Suas configuracoes foram carregadas!",
             Duration = 3
         })
     else
         game.StarterGui:SetCore("SendNotification", {
             Title = "Erro",
-            Text = "Nenhuma configuração salva encontrada!",
+            Text = "Nenhuma configuracao salva encontrada!",
             Duration = 3
         })
     end
