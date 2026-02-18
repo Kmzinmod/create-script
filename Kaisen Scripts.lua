@@ -443,7 +443,6 @@ local ConfigBtn, ConfigIcon, ConfigLabel = createMenuButton("Config", "⚙️", 
 
 -- Função para trocar seções
 local function switchSection(section, button, icon, label)
-    -- Desativa todos
     MainSection.Visible = false
     ConfigSection.Visible = false
     
@@ -456,7 +455,6 @@ local function switchSection(section, button, icon, label)
     MainLabel.TextColor3 = Color3.fromRGB(150, 150, 160)
     ConfigLabel.TextColor3 = Color3.fromRGB(150, 150, 160)
     
-    -- Ativa o selecionado
     section.Visible = true
     button.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
     icon.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -473,77 +471,104 @@ end)
 
 -- ==================== MAIN FEATURES ====================
 
--- Função para criar/destruir GUI de coordenadas
+-- Função para criar/destruir GUI de coordenadas (DRAGGABLE)
 local function toggleCoordinates(enabled)
     if enabled then
-        -- Criar GUI de coordenadas
         local character = player.Character or player.CharacterAdded:Wait()
         local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-        
+
         coordinatesGui = Instance.new("ScreenGui")
         coordinatesGui.Name = "PositionDisplay"
         coordinatesGui.ResetOnSpawn = false
         coordinatesGui.Parent = player.PlayerGui
-        
+
+        -- Frame principal draggable
         local frame = Instance.new("Frame")
-        frame.Size = UDim2.new(0, 250, 0, 120)
-        frame.Position = UDim2.new(1, -260, 0, 10)
-        frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        frame.BorderSizePixel = 2
-        frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+        frame.Size = UDim2.new(0, 200, 0, 130)
+        frame.Position = UDim2.new(1, -210, 0, 10)
+        frame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+        frame.BorderSizePixel = 0
+        frame.Active = true
+        frame.Draggable = true  -- Permite arrastar o painel
         frame.Parent = coordinatesGui
-        
+
         local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 8)
+        corner.CornerRadius = UDim.new(0, 10)
         corner.Parent = frame
-        
-        local title = Instance.new("TextLabel")
-        title.Size = UDim2.new(1, 0, 0, 30)
-        title.Position = UDim2.new(0, 0, 0, 0)
-        title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        title.Text = "Localizacao"
-        title.TextColor3 = Color3.fromRGB(255, 255, 255)
-        title.Font = Enum.Font.GothamBold
-        title.TextSize = 16
-        title.Parent = frame
-        
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Color = Color3.fromRGB(100, 180, 255)
+        stroke.Thickness = 1.5
+        stroke.Parent = frame
+
+        -- Barra de título (drag handle visual)
+        local titleBar = Instance.new("Frame")
+        titleBar.Size = UDim2.new(1, 0, 0, 30)
+        titleBar.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
+        titleBar.BorderSizePixel = 0
+        titleBar.Parent = frame
+
         local titleCorner = Instance.new("UICorner")
-        titleCorner.CornerRadius = UDim.new(0, 8)
-        titleCorner.Parent = title
-        
-        local xLabel = Instance.new("TextLabel")
-        xLabel.Size = UDim2.new(1, -20, 0, 25)
-        xLabel.Position = UDim2.new(0, 10, 0, 35)
-        xLabel.BackgroundTransparency = 1
-        xLabel.Text = "X: 0"
-        xLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-        xLabel.Font = Enum.Font.GothamMedium
-        xLabel.TextSize = 14
-        xLabel.TextXAlignment = Enum.TextXAlignment.Left
-        xLabel.Parent = frame
-        
-        local yLabel = Instance.new("TextLabel")
-        yLabel.Size = UDim2.new(1, -20, 0, 25)
-        yLabel.Position = UDim2.new(0, 10, 0, 60)
-        yLabel.BackgroundTransparency = 1
-        yLabel.Text = "Y: 0"
-        yLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-        yLabel.Font = Enum.Font.GothamMedium
-        yLabel.TextSize = 14
-        yLabel.TextXAlignment = Enum.TextXAlignment.Left
-        yLabel.Parent = frame
-        
-        local zLabel = Instance.new("TextLabel")
-        zLabel.Size = UDim2.new(1, -20, 0, 25)
-        zLabel.Position = UDim2.new(0, 10, 0, 85)
-        zLabel.BackgroundTransparency = 1
-        zLabel.Text = "Z: 0"
-        zLabel.TextColor3 = Color3.fromRGB(100, 100, 255)
-        zLabel.Font = Enum.Font.GothamMedium
-        zLabel.TextSize = 14
-        zLabel.TextXAlignment = Enum.TextXAlignment.Left
-        zLabel.Parent = frame
-        
+        titleCorner.CornerRadius = UDim.new(0, 10)
+        titleCorner.Parent = titleBar
+
+        -- Cobre o canto inferior arredondado da titleBar
+        local titleBarFix = Instance.new("Frame")
+        titleBarFix.Size = UDim2.new(1, 0, 0, 10)
+        titleBarFix.Position = UDim2.new(0, 0, 1, -10)
+        titleBarFix.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
+        titleBarFix.BorderSizePixel = 0
+        titleBarFix.Parent = titleBar
+
+        local titleIcon = Instance.new("TextLabel")
+        titleIcon.Size = UDim2.new(0, 20, 1, 0)
+        titleIcon.Position = UDim2.new(0, 8, 0, 0)
+        titleIcon.BackgroundTransparency = 1
+        titleIcon.Text = "⠿"
+        titleIcon.Font = Enum.Font.GothamBold
+        titleIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
+        titleIcon.TextSize = 18
+        titleIcon.Parent = titleBar
+
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Size = UDim2.new(1, -30, 1, 0)
+        titleLabel.Position = UDim2.new(0, 28, 0, 0)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.Text = "📍 Localização"
+        titleLabel.Font = Enum.Font.GothamBold
+        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        titleLabel.TextSize = 13
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        titleLabel.Parent = titleBar
+
+        -- Função auxiliar para criar label de coordenada
+        local function makeCoordLabel(labelText, color, yPos)
+            local bg = Instance.new("Frame")
+            bg.Size = UDim2.new(1, -16, 0, 24)
+            bg.Position = UDim2.new(0, 8, 0, yPos)
+            bg.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
+            bg.BorderSizePixel = 0
+            bg.Parent = frame
+            Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 6)
+
+            local lbl = Instance.new("TextLabel")
+            lbl.Size = UDim2.new(1, -10, 1, 0)
+            lbl.Position = UDim2.new(0, 8, 0, 0)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = labelText
+            lbl.TextColor3 = color
+            lbl.Font = Enum.Font.GothamMedium
+            lbl.TextSize = 13
+            lbl.TextXAlignment = Enum.TextXAlignment.Left
+            lbl.Parent = bg
+            return lbl
+        end
+
+        local xLabel = makeCoordLabel("X: 0", Color3.fromRGB(255, 100, 100), 38)
+        local yLabel = makeCoordLabel("Y: 0", Color3.fromRGB(100, 220, 100), 68)
+        local zLabel = makeCoordLabel("Z: 0", Color3.fromRGB(100, 140, 255), 98)
+
+        -- Atualiza posição a cada frame
         local function updatePosition()
             if character and humanoidRootPart then
                 local pos = humanoidRootPart.Position
@@ -552,31 +577,28 @@ local function toggleCoordinates(enabled)
                 zLabel.Text = "Z: " .. math.floor(pos.Z * 10) / 10
             end
         end
-        
+
         coordinatesConnection = RunService.RenderStepped:Connect(updatePosition)
-        
+
         player.CharacterAdded:Connect(function(newCharacter)
             character = newCharacter
             humanoidRootPart = character:WaitForChild("HumanoidRootPart")
         end)
-        
+
         game.StarterGui:SetCore("SendNotification", {
             Title = "Coordenadas",
-            Text = "Sistema de coordenadas ativado!",
+            Text = "Arraste o painel para mover!",
             Duration = 3
         })
     else
-        -- Destruir GUI de coordenadas
         if coordinatesGui then
             coordinatesGui:Destroy()
             coordinatesGui = nil
         end
-        
         if coordinatesConnection then
             coordinatesConnection:Disconnect()
             coordinatesConnection = nil
         end
-        
         game.StarterGui:SetCore("SendNotification", {
             Title = "Coordenadas",
             Text = "Sistema de coordenadas desativado!",
@@ -610,7 +632,6 @@ DexBtn.MouseButton1Click:Connect(function()
         Text = "Carregando Dex Explorer V4...",
         Duration = 3
     })
-    
     loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
 end)
 
@@ -633,7 +654,6 @@ RemoteSpyBtn.MouseButton1Click:Connect(function()
         Text = "Carregando Remote Spy...",
         Duration = 3
     })
-    
     loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/SimpleSpyV3/main.lua"))()
 end)
 
@@ -656,7 +676,6 @@ InfiniteYieldBtn.MouseButton1Click:Connect(function()
         Text = "Carregando Infinite Yield...",
         Duration = 3
     })
-    
     loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
 end)
 
@@ -731,7 +750,6 @@ Instance.new("UICorner", CopyCodeBtn).CornerRadius = UDim.new(0, 6)
 
 ExecuteCustomBtn.MouseButton1Click:Connect(function()
     local url = UrlInput.Text
-    
     if url == "" then
         game.StarterGui:SetCore("SendNotification", {
             Title = "Erro",
@@ -740,17 +758,14 @@ ExecuteCustomBtn.MouseButton1Click:Connect(function()
         })
         return
     end
-    
     game.StarterGui:SetCore("SendNotification", {
         Title = "Script Customizado",
         Text = "Executando script...",
         Duration = 3
     })
-    
     local success, err = pcall(function()
         loadstring(game:HttpGet(url))()
     end)
-    
     if not success then
         game.StarterGui:SetCore("SendNotification", {
             Title = "Erro",
@@ -768,7 +783,6 @@ end)
 
 CopyCodeBtn.MouseButton1Click:Connect(function()
     local url = UrlInput.Text
-    
     if url == "" then
         game.StarterGui:SetCore("SendNotification", {
             Title = "Erro",
@@ -777,14 +791,10 @@ CopyCodeBtn.MouseButton1Click:Connect(function()
         })
         return
     end
-    
     local code = "loadstring(game:HttpGet(\"" .. url .. "\"))()"
-    
-    -- Tenta usar setclipboard se disponível
     local success = pcall(function()
         setclipboard(code)
     end)
-    
     if success then
         game.StarterGui:SetCore("SendNotification", {
             Title = "Copiado!",
@@ -792,7 +802,6 @@ CopyCodeBtn.MouseButton1Click:Connect(function()
             Duration = 3
         })
     else
-        -- Se setclipboard não estiver disponível, mostra o código
         game.StarterGui:SetCore("SendNotification", {
             Title = "Codigo",
             Text = "setclipboard nao disponivel",
@@ -808,7 +817,6 @@ end)
 
 createKeybind("Toggle UI Key", Config.ToggleKey, ConfigSection, function(newKey)
     Config.ToggleKey = newKey
-    
     game.StarterGui:SetCore("SendNotification", {
         Title = "Keybind Atualizada",
         Text = "Nova tecla: " .. newKey.Name,
@@ -830,7 +838,6 @@ Instance.new("UICorner", SaveBtn).CornerRadius = UDim.new(0, 8)
 
 SaveBtn.MouseButton1Click:Connect(function()
     writefile("KaisenScripts_Config.json", game:GetService("HttpService"):JSONEncode(Config))
-    
     game.StarterGui:SetCore("SendNotification", {
         Title = "Configuracao Salva",
         Text = "Suas configuracoes foram salvas!",
@@ -856,7 +863,6 @@ LoadBtn.MouseButton1Click:Connect(function()
         for k, v in pairs(loaded) do
             Config[k] = v
         end
-        
         game.StarterGui:SetCore("SendNotification", {
             Title = "Configuracao Carregada",
             Text = "Suas configuracoes foram carregadas!",
