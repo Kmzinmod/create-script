@@ -1,6 +1,6 @@
 --[[
     ╔═══════════════════════════════════╗
-    ║     KAISEN SCRIPTS - V6.1         ║
+    ║     KAISEN SCRIPTS - V1.0         ║
     ║   Don't Get Crushed By 67         ║
     ║         By: KAISEN                ║
     ╚═══════════════════════════════════╝
