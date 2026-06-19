@@ -27,7 +27,7 @@ local coordinatesConnection = nil
 -- ============================================
 local KaisenUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kmzinmod/Kaisen-UI/refs/heads/main/UI.luau"))({
     Title = "⚡ Kaisen Scripts",
-    Subtitle = "v6.1",
+    Subtitle = "v1.0",
     ToggleKey = Config.ToggleKey,
     MainColor = Color3.fromRGB(100, 180, 255),
     BackgroundColor = Color3.fromRGB(18, 18, 22),
